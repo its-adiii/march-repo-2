@@ -1,0 +1,45 @@
+:root {
+  --primary-blue: #03a9f4;
+  --primary-gradient: linear-gradient(135deg, #03a9f4 0%, #0288d1 100%);
+  --secondary-blue: #0288d1;
+  --accent-orange: #ff5722;
+  --dark-gray: #37474f;
+  --light-gray: #f5f5f5;
+  --white: #ffffff;
+}
+
+.bg-gradient-blue {
+  background: var(--primary-gradient);
+}
+
+.bg-primary-blue {
+  background-color: var(--primary-blue);
+}
+
+.text-primary-blue {
+  color: var(--primary-blue);
+}
+
+.border-primary-blue {
+  border-color: var(--primary-blue);
+}
+
+.hover\:bg-secondary-blue:hover {
+  background-color: var(--secondary-blue);
+}
+
+.bg-accent-orange {
+  background-color: var(--accent-orange);
+}
+
+.hover\:bg-accent-orange:hover {
+  background-color: #f4511e;
+}
+
+.bg-dark-gray {
+  background-color: var(--dark-gray);
+}
+
+.hover\:bg-dark-gray:hover {
+  background-color: #263238;
+}
