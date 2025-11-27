@@ -1,7 +1,9 @@
 import axios from 'axios';
 import jobsData from '../data/jobs.json';
 
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/.netlify/functions' 
+  : 'http://localhost:5000/api';
 
 // Enhanced skill patterns with variations and categories
 const SKILL_PATTERNS = {
@@ -399,50 +401,78 @@ const calculateRoleMatch = (jobTitle, cvText) => {
 
 export const uploadCV = async (file) => {
   try {
-    const reader = new FileReader();
+    const isProduction = process.env.NODE_ENV === 'production';
     
-    return new Promise((resolve, reject) => {
-      reader.onload = async (event) => {
-        try {
-          const cvText = event.target.result;
-          
-          // Comprehensive CV analysis
-          const cvAnalysis = {
-            skills: extractSkillsWithContext(cvText),
-            experience: extractExperienceFromCV(cvText),
-            keyPhrases: extractKeyPhrases(cvText),
-            projectComplexity: analyzeProjectComplexity(cvText),
-            industries: extractIndustryExperience(cvText),
-            skillContext: extractSkillsWithContext(cvText)
-          };
-          
-          // Get recommendations
-          const recommendations = await getJobRecommendations(cvAnalysis);
-          
-          resolve({
-            success: true,
-            data: {
-              analysis: cvAnalysis,
-              recommendations: recommendations.data
-            }
-          });
-        } catch (error) {
-          reject({
-            success: false,
-            error: 'Failed to process CV'
-          });
+    if (isProduction) {
+      // Use Netlify function in production
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/.netlify/functions/upload-cv', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process CV');
+      }
+      
+      return {
+        success: true,
+        data: {
+          recommendations: data.recommendations,
+          analysis: { mock: true } // Mock analysis for production
         }
       };
+    } else {
+      // Use local processing in development
+      const reader = new FileReader();
       
-      reader.onerror = () => {
-        reject({
-          success: false,
-          error: 'Failed to read CV file'
-        });
-      };
-      
-      reader.readAsText(file);
-    });
+      return new Promise((resolve, reject) => {
+        reader.onload = async (event) => {
+          try {
+            const cvText = event.target.result;
+            
+            // Comprehensive CV analysis
+            const cvAnalysis = {
+              skills: extractSkillsWithContext(cvText),
+              experience: extractExperienceFromCV(cvText),
+              keyPhrases: extractKeyPhrases(cvText),
+              projectComplexity: analyzeProjectComplexity(cvText),
+              industries: extractIndustryExperience(cvText),
+              skillContext: extractSkillsWithContext(cvText)
+            };
+            
+            // Get recommendations
+            const recommendations = await getJobRecommendations(cvAnalysis);
+            
+            resolve({
+              success: true,
+              data: {
+                analysis: cvAnalysis,
+                recommendations: recommendations.data
+              }
+            });
+          } catch (error) {
+            reject({
+              success: false,
+              error: 'Failed to process CV'
+            });
+          }
+        };
+        
+        reader.onerror = () => {
+          reject({
+            success: false,
+            error: 'Failed to read CV file'
+          });
+        };
+        
+        reader.readAsText(file);
+      });
+    }
   } catch (error) {
     console.error('Error processing CV:', error);
     throw error;

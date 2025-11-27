@@ -1,0 +1,10 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify functions for HireMe AI",
+  "dependencies": {},
+  "scripts": {
+    "serve": "netlify-lambda serve src",
+    "build": "netlify-lambda build src"
+  }
+}
