@@ -105,6 +105,35 @@ function Hero({ getRootProps, getInputProps, selectedFiles, loading, error }) {
           transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="hidden lg:flex justify-end items-center relative"
         >
+          {/* Fun Interactive Draggable Orbs */}
+          <motion.div 
+            drag 
+            dragConstraints={{ left: -300, right: 100, top: -200, bottom: 300 }} 
+            whileHover={{ scale: 1.1 }}
+            whileDrag={{ scale: 1.2, cursor: "grabbing" }}
+            className="absolute -left-16 top-16 w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold shadow-[0_0_30px_rgba(79,70,229,0.5)] z-40 cursor-grab"
+          >
+            React
+          </motion.div>
+          <motion.div 
+            drag 
+            dragConstraints={{ left: -200, right: 100, top: -100, bottom: 400 }}
+            whileHover={{ scale: 1.1 }}
+            whileDrag={{ scale: 1.2, cursor: "grabbing" }} 
+            className="absolute right-4 -top-8 w-24 h-24 bg-gradient-to-tr from-green-500 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold shadow-[0_0_30px_rgba(16,185,129,0.5)] z-40 cursor-grab"
+          >
+            Python
+          </motion.div>
+          <motion.div 
+            drag 
+            dragConstraints={{ left: -100, right: 50, top: -300, bottom: 200 }}
+            whileHover={{ scale: 1.1 }}
+            whileDrag={{ scale: 1.2, cursor: "grabbing" }} 
+            className="absolute left-8 bottom-12 w-16 h-16 bg-gradient-to-tr from-gold-500 to-yellow-400 rounded-full flex items-center justify-center text-charcoal-900 font-bold shadow-[0_0_30px_rgba(234,179,8,0.5)] z-40 cursor-grab"
+          >
+            AWS
+          </motion.div>
+
           {/* Decorative background circle behind illustration */}
           <div className="absolute w-[80%] h-[120%] bg-gradient-to-tr from-charcoal-800/40 to-charcoal-700/10 rounded-full blur-[60px] -z-10 right-0"></div>
           <div className="relative group rounded-2xl overflow-hidden glass-card p-2 transform rotate-2 hover:rotate-0 transition-transform duration-700 shadow-2xl before:hidden">

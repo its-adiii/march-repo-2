@@ -9,7 +9,7 @@ function Header({ scrollY, setShowRegistration, setShowPostJob }) {
         ? 'bg-charcoal-900/80 backdrop-blur-2xl border-b border-white/5 py-4 shadow-sm'
         : 'bg-transparent py-6'
     }`}>
-      <div className="container mx-auto px-8 md:px-12 flex items-center justify-between">
+      <div className="w-full flex items-center justify-between px-6 md:px-12">
         <motion.div 
           className="flex items-center space-x-5"
           initial={{ opacity: 0, x: -20 }}
