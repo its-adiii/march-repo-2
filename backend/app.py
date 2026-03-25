@@ -42,8 +42,13 @@ def load_job_dataset():
     if os.path.exists('jobs.db'):
         from database import engine
         import pandas as pd
-        print("💽 Loading exactly 1000 jobs randomly from SQLite to remain under 512MB RAM...")
-        query = "SELECT * FROM job_listings ORDER BY RANDOM() LIMIT 1000"
+        import random
+        print("💽 Fast-loading 1000 jobs from SQLite...")
+        
+        # OOM & CPU Fix: 'ORDER BY RANDOM()' does a full 21k table scan which kills the 0.1 CPU. 
+        # Instead, calculate a random indexed offset (0 to 20,000) for instantaneous O(1) lookup!
+        random_offset = random.randint(0, 20000)
+        query = f"SELECT * FROM job_listings LIMIT 1000 OFFSET {random_offset}"
         return pd.read_sql(query, con=engine)
     elif os.path.exists('prepared_jobs.csv'):
         import pandas as pd
