@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import RecommendList from './components/RecommendList';
+import Testimonials from './components/Testimonials';
+import ContactUs from './components/ContactUs';
 import Footer from './components/Footer';
 import PostJobModal from './components/PostJobModal';
 import './App.css';
@@ -101,13 +103,17 @@ function App() {
       <main className="relative z-10 editorial-spacing px-6 md:px-12 mx-auto max-w-7xl">
         <AnimatePresence mode="wait">
           {!recommendations.length ? (
-            <Hero 
-              getRootProps={getRootProps}
-              getInputProps={getInputProps}
-              selectedFiles={selectedFiles}
-              loading={loading}
-              error={error}
-            />
+            <div className="flex flex-col gap-8">
+              <Hero 
+                getRootProps={getRootProps}
+                getInputProps={getInputProps}
+                selectedFiles={selectedFiles}
+                loading={loading}
+                error={error}
+              />
+              <Testimonials />
+              <ContactUs />
+            </div>
           ) : (
             <RecommendList 
               recommendations={recommendations}

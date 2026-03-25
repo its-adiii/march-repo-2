@@ -19,7 +19,11 @@ export const uploadCV = async (file) => {
     return {
       success: true,
       data: {
-        recommendations: data.recommendations,
+        recommendations: (data.recommendations || []).map(job => ({
+          ...job,
+          matchScore: job.match_score,
+          postedDate: job.posted_date
+        })),
         message: data.message
       }
     };
@@ -49,7 +53,11 @@ export const getJobRecommendations = async (cvText) => {
 
     return {
       success: true,
-      data: data.recommendations
+      data: (data.recommendations || []).map(job => ({
+        ...job,
+        matchScore: job.match_score,
+        postedDate: job.posted_date
+      }))
     };
   } catch (error) {
     return {
