@@ -49,8 +49,12 @@ def load_job_dataset():
     else:
         from train_model import create_sample_dataset
         return create_sample_dataset()
-
 job_data = load_job_dataset()
+
+# RAM DOWN-SAMPLING: Temporarily restrict to 1,000 random diverse jobs to fit in Render's 512MB limit!
+if len(job_data) > 1000:
+    print(f"📉 Downsampling {len(job_data)} jobs to 1000 to prevent Render 502 Bad Gateway OOM...")
+    job_data = job_data.sample(n=1000, random_state=42).reset_index(drop=True)
 
 # OOM Prevention: Precalculate the intensive TF-IDF Vectors once dynamically at startup!
 print("🧠 System: Pre-calculating 21k NLP arrays for instant API serving...")
