@@ -3,8 +3,6 @@ build/
 .env
 backend/postings.csv
 backend/prepared_jobs.csv
-backend/jobs.db
-backend/job_recommendation_model.pkl
 backend/__pycache__/
 backend/venv/
 backend/env/
