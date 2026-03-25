@@ -89,7 +89,7 @@ function JobCard({ job, isExpanded, onToggleExpand, getMatchColor, handleApplyNo
             </div>
             <div className="flex items-center justify-end space-x-3 mb-2">
               <SkillRadar matchScore={job.matchScore} />
-              <div className={`text-4xl font-display font-bold text-green-400 tracking-tighter`}>
+              <div className={`text-4xl font-display font-bold ${colors.text} tracking-tighter`}>
                 {job.matchScore}%
               </div>
             </div>
