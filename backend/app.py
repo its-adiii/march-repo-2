@@ -37,9 +37,18 @@ else:
 
 # Load job dataset
 def load_job_dataset():
-    """Load job dataset - you can replace this with Kaggle dataset"""
-    from train_model import create_sample_dataset
-    return create_sample_dataset()
+    """Load job dataset from SQLite or fallback"""
+    import os
+    if os.path.exists('jobs.db'):
+        from database import engine
+        import pandas as pd
+        return pd.read_sql('job_listings', con=engine)
+    elif os.path.exists('prepared_jobs.csv'):
+        import pandas as pd
+        return pd.read_csv('prepared_jobs.csv')
+    else:
+        from train_model import create_sample_dataset
+        return create_sample_dataset()
 
 job_data = load_job_dataset()
 
@@ -149,6 +158,33 @@ def upload_cv():
         # Get job recommendations
         recommendations = model.predict_job_match(cleaned_text, job_data, top_k=5)
         
+        # Save to database
+        try:
+            from database import SessionLocal, UserSubmission, MatchResult
+            session = SessionLocal()
+            
+            name = request.form.get('name', 'Anonymous Candidate')
+            email = request.form.get('email', 'anonymous@example.com')
+            
+            user_sub = UserSubmission(name=name, email=email, cv_text=cleaned_text[:5000])
+            session.add(user_sub)
+            session.commit()
+            
+            # Save matches
+            for rec in recommendations:
+                if rec.get('id'):
+                    match = MatchResult(
+                        user_id=user_sub.id,
+                        job_id=rec['id'],
+                        match_score=rec['match_score']
+                    )
+                    session.add(match)
+            session.commit()
+            session.close()
+            print(f"💾 Saved UserSubmission {user_sub.id} to SQLite database!")
+        except Exception as db_err:
+            print(f"⚠️ Failed to save to DB: {db_err}")
+        
         # Clean up the uploaded file
         os.remove(file_path)
         
@@ -203,6 +239,45 @@ def get_all_jobs():
         
     except Exception as e:
         return jsonify({'error': f'Error fetching jobs: {str(e)}'}), 500
+
+@app.route('/api/jobs', methods=['POST'])
+def create_job():
+    """Create a new job posting"""
+    global job_data
+    try:
+        data = request.get_json()
+        
+        required_fields = ['title', 'company', 'description', 'location']
+        for field in required_fields:
+            if field not in data or not data[field].strip():
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+                
+        # Generate new ID
+        new_id = len(job_data) + 1
+        
+        new_job = {
+            'id': new_id,
+            'title': data['title'],
+            'company': data['company'],
+            'description': data['description'],
+            'requirements': data.get('requirements', ''),
+            'location': data.get('location', 'Remote'),
+            'type': data.get('type', 'Full-time'),
+            'salary': data.get('salary', 'Not Specified'),
+            'experience': data.get('experience', 'Entry-Senior'),
+            'skills': data.get('skills', [])
+        }
+        
+        # Append to global job_data dataframe
+        job_data = pd.concat([job_data, pd.DataFrame([new_job])], ignore_index=True)
+        
+        return jsonify({
+            'success': True,
+            'job': new_job,
+            'message': 'Job posted successfully!'
+        })
+    except Exception as e:
+        return jsonify({'error': f'Error posting job: {str(e)}'}), 500
 
 @app.route('/api/jobs/search', methods=['POST'])
 def search_jobs():

@@ -1,26 +1,23 @@
 [build]
-  base = "frontend/"
+  # Build command for the React frontend
   command = "npm run build"
-  publish = "frontend/build/"
-  functions = "frontend/netlify/functions"
+  # Directory containing the built files
+  publish = "build"
+  # Node.js version
+  node_version = "18"
 
 [build.environment]
-  NODE_VERSION = "18"
+  # Environment variables
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  NPM_VERSION = "9"
 
+# Redirect rules for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[context.production]
-  command = "npm run build"
-
-[context.deploy-preview]
-  command = "npm run build"
-
-[context.branch-deploy]
-  command = "npm run build"
-
+# Headers for security and performance
 [[headers]]
   for = "/*"
   [headers.values]
@@ -33,6 +30,11 @@
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
+
+# API proxy (optional - for future backend deployment)
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-url.com/api/:splat"
+  status = 200
+  force = true
+  # Comment this out if you don't have a deployed backend
