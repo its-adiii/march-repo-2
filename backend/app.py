@@ -52,6 +52,11 @@ def load_job_dataset():
 
 job_data = load_job_dataset()
 
+# OOM Prevention: Precalculate the intensive TF-IDF Vectors once dynamically at startup!
+print("🧠 System: Pre-calculating 21k NLP arrays for instant API serving...")
+global_job_features, _ = model.create_features(job_data, is_training=False)
+print("✅ Vector Space Active!")
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -156,7 +161,7 @@ def upload_cv():
         cleaned_text = clean_resume_text(resume_text)
         
         # Get job recommendations
-        recommendations = model.predict_job_match(cleaned_text, job_data, top_k=5)
+        recommendations = model.predict_job_match(cleaned_text, job_data, top_k=5, precomputed_job_features=global_job_features)
         
         # Save to database
         try:
@@ -214,7 +219,7 @@ def get_recommendations():
         cleaned_text = clean_resume_text(resume_text)
         
         # Get recommendations
-        recommendations = model.predict_job_match(cleaned_text, job_data, top_k=top_k)
+        recommendations = model.predict_job_match(cleaned_text, job_data, top_k=top_k, precomputed_job_features=global_job_features)
         
         return jsonify({
             'success': True,

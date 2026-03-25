@@ -164,7 +164,7 @@ class JobRecommendationModel:
         
         return accuracy
     
-    def predict_job_match(self, resume_text, job_data, top_k=5):
+    def predict_job_match(self, resume_text, job_data, top_k=5, precomputed_job_features=None):
         """Predict job matches for a given resume"""
         # Preprocess resume
         resume_df = pd.DataFrame({
@@ -176,7 +176,10 @@ class JobRecommendationModel:
         resume_features, _ = self.create_features(resume_df, is_training=False)
         
         # Get job features
-        job_features, _ = self.create_features(job_data, is_training=False)
+        if precomputed_job_features is not None:
+            job_features = precomputed_job_features
+        else:
+            job_features, _ = self.create_features(job_data, is_training=False)
         
         # Calculate similarity scores
         from sklearn.metrics.pairwise import cosine_similarity
